@@ -1,6 +1,6 @@
 # GUA SARANIN KETIKA GARAP APAPUN TESTNETNYA PAKAI WALLET NEW PAHAM!!!!! ADA ERROR BILANG 
-New Testnet: Oroswap 🏷 Reward : Confirmed   Wallet:  Keplr Network : Zigchain Testnet
-OROSWAP Testnet Bot
+New Testnet: Oroswap 🏷 Reward : Confirmed   Wallet:  Keplr Network 
+
 Bot otomatis untuk melakukan swap dan provide liquidity di jaringan testnet Zigchain (ZIG ↔️ ORO) menggunakan wallet Keplr atau Leap.
 
 📦 Repository: here
