@@ -1,4 +1,3 @@
-// oroswap_bot.js
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -6,14 +5,12 @@ const { SigningCosmWasmClient, CosmWasmClient } = require('@cosmjs/cosmwasm-star
 const { DirectSecp256k1HdWallet } = require('@cosmjs/proto-signing');
 const { calculateFee, GasPrice } = require('@cosmjs/stargate');
 
-// Clear terminal and show header
 console.clear();
 console.log("\x1b[35m%s\x1b[0m", "============================================");
 console.log("\x1b[36m%s\x1b[0m", "      OROSWAP BOT - WALLET KEPLR/LEAP       ");
-console.log("\x1b[36m%s\x1b[0m", "                BACTIAR291                  ");
+console.log("\x1b[36m%s\x1b[0m", "               BACTIAR291                   ");
 console.log("\x1b[35m%s\x1b[0m", "============================================\n");
 
-// Read mnemonic from file
 const MNEMONIC = fs.readFileSync(path.join(__dirname, "phrase.txt"), "utf8").trim();
 
 const CONFIG = {
@@ -29,7 +26,13 @@ const ZIG_AMOUNT = 0.01;
 const ORO_AMOUNT = 0.01;
 const LIQ_ORO = "10";
 const LIQ_ZIG = "4";
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const delay = async (ms) => {
+    for (let i = ms / 1000; i > 0; i--) {
+        process.stdout.write(`\r⏳ Menunggu ${i} detik... `);
+        await new Promise(res => setTimeout(res, 1000));
+    }
+    process.stdout.write("\r\n");
+};
 
 async function getBalance(mnemonic, denom) {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: "zig" });
@@ -80,10 +83,12 @@ async function swap(mnemonic, amount, fromDenom, toDenom) {
             { denom: fromDenom, amount: baseAmount }
         ]);
 
-        console.log(`\n✅ Swap ${fromDenom} → ${toDenom} | TX: ${result.transactionHash}`);
+        const fromName = fromDenom === CONFIG.zigDenom ? "ZIG" : "ORO";
+        const toName = toDenom === CONFIG.zigDenom ? "ZIG" : "ORO";
+        console.log(`\n✅ Swap ${fromName} → ${toName} berhasil! TX: ${result.transactionHash}`);
         console.log(`🔍 https://zigscan.org/tx/${result.transactionHash}`);
     } catch (e) {
-        console.error(`❌ Gagal swap ${fromDenom} → ${toDenom}:`, e.message);
+        console.error(`❌ Gagal swap:`, e.message);
     }
 }
 
@@ -120,7 +125,7 @@ async function addLiquidity(mnemonic, amountUoro, amountUzig) {
 
         const result = await client.execute(account.address, CONFIG.swapContract, msg, fee, "Swap", funds);
 
-        console.log(`\n✅ Add Liquidity ORO+ZIG | TX: ${result.transactionHash}`);
+        console.log(`\n✅ Provide liquidity pair ORO/ZIG sukses! TX: ${result.transactionHash}`);
         console.log(`🔍 https://zigscan.org/tx/${result.transactionHash}`);
     } catch (err) {
         console.error("❌ Gagal Add Liquidity:", err.message);
@@ -142,7 +147,6 @@ async function runBot() {
 
         console.log("\n💧 Menambahkan Liquidity...");
         await addLiquidity(MNEMONIC, LIQ_ORO, LIQ_ZIG);
-        console.log("⏱️ Menunggu 15 detik sebelum siklus berikutnya...");
         await delay(15000);
     }
 }
